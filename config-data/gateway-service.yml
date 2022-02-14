@@ -1,0 +1,37 @@
+server:
+  port: 8090
+spring:
+  cloud:
+    gateway:
+      default-filters:
+      - TokenRelay
+      discovery:
+        locator:
+          enabled: true
+      routes:
+      - id: customer-service
+        uri: lb://customer-service
+        predicates:
+        - Path=/customers/**
+      - id: product-service
+        uri: lb://product-service
+        predicates:
+        - Path=/product/**
+      - id: shopping-service
+        uri: lb://shopping-service
+        predicates:
+        - Path=/invoices/**
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/auth/realms/dev
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            client-id: gateway-service
+            client-secret: 4e33cdca-c90f-4301-94a2-0913628586e2
+logging:
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n'
